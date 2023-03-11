@@ -52,15 +52,17 @@ des = {1: 'ETUKNO',
        24: 'ALCHEM',
        25: 'EDUFHK'}
 listeMotsJoueur1 = ['ALLO', 'TEST', 'yo']
-listeMotsJoueur2 = ['SUP', 'TEST']
+listeMotsJoueur2 = ['supe', 'TEST']
 listeListeMotsJoueurs = [listeMotsJoueur1, listeMotsJoueur2]
 width = 29
+xInitial = 0
+yInitial = 0
 
 # Déclaration des fonctions internes et calculs 
 # avec commentaires détaillés nécessaires seulement (optionnel)
 
 def generer_grille(taille):
-    for i in range(taille):
+    for row in range(taille):
         grilleGeneree.append([])
         # listeDesChoisis est une liste 2D qui contient tous les des choisis par le random.randint()
         # listeDesChoisis.append([])
@@ -68,17 +70,19 @@ def generer_grille(taille):
             # taille**2 evite dutiliser un if, car si taille == 4, alors taille**2 == 16 et donc seulement les des 1 a 16 sont pris
             de = des[random.randint(1, taille**2)]
             faceDe = de[random.randint(0, 5)]
-            grilleGeneree[i].append(faceDe)
+            grilleGeneree[row].append(faceDe)
             # listeDesChoisis[i].append(de)
+    #grilleGeneree = [['a', 'b', 'c', 'd'],['a', 'e', 'i', 'o'],['p','u','o','b'],['y','r','s','n']]
+
     return grilleGeneree
 
 def afficher_grille(grille):
-    for liste in grille:
+    for row in grille:
         # top line de ----------- a chaque new line
         print('-'*(len(grille)*4)+'-')
         # le | manquant du debut de chaque ligne de la premiere colonne puisquon ne fait que mettre un ' |' apres chaque element (il manque donc celui du debut avant chaque premier element de chaque ligne)
         print('|', end=' ')
-        for mot in liste:
+        for mot in row:
             print(mot + ' |', end=' ')
         print()
     # bottom line de ------------ (vu quon met la top line dans la loop, il va manquer une derniere ligne de -------------)
@@ -112,7 +116,7 @@ def afficher_pointage(grille, numeroJoueur):
 
         # TODO: implementer la mention -- REJETER
         
-        # ajustement de laffichage
+        # ajustement de laffichage, centrer en un point fixe
         if len(mot) == longueurMotLePlusLong:
             print(mot + ' ' + f'({calcul_point(grille, mot)})' + f'{legalite}')
         else:
@@ -129,11 +133,80 @@ def afficher_pointage(grille, numeroJoueur):
 
 # TODO: verifier si le mot nest pas deja trouve par un autre joueur -- en faire une autre fonction et lappeler dans jouer()?   
 def est_valide(grille, mot):
-    # if grille[][]
-    # PLACEHOLDER TRUE POUR LINSTANT **** A CHANGER ****
-    return False
+    # un mot est valide quand:
+    # 1. same column
+    # 2. same line
+    # 3. adjacent letters, but not necessarily same line or same column (BONUS)
+    # 4. le mot nest pas deja touve
+    
+    valide = True
+    # on verifie que chaque lettre est presente dans la grille
+    
+    # PROBLEME avec cette facon de faire: la loop prend la premiere lettre quil trouve, alors
+    # en cas de duplicate, ce nest pas necessairement la bonne lettre et est_valide retourne FAUX alors
+    # que ca devrait etre VRAI
 
-# Fonction qui calcule soit les points dun seul mots, ou bien les points dune liste de mots
+    # Pour regler le probleme il faut continue de passer au travers la grille malgre 
+    # la condition insatisfaite pour detecter une meme lettre qui pourrait satisfaire 
+    # les conditions
+
+    # Autre probleme: la loop pourrait rencontrer une premiere lettre duplicate et donc le reste des lettres ne sont pas adjacentes,
+    # mais elles sont en realites adjacentes a la meme lettre dans une autre position de la grille
+
+    # Autre probleme: exemple: TEST -- la loop reprend la position du 1er T pour le 2e T
+
+    i = 0
+    for letter in mot:
+        for row in grille:
+            if letter in row:
+                if i == 0:
+                    global xInitial, yInitial
+                    xInitial = row.index(letter)
+                    yInitial = grille.index(row)
+                    valide = True
+                    break
+                # non seulement la lettre doit etre contenue dans
+                else:
+                    # ici on sait quon a pas la premiere lettre mais que la lettre est contenue dans la grille
+                    
+                    # Storer les x et y dans une liste pour les comparer et eviter de reprendre une meme lettre?
+                    
+                    x = row.index(letter)
+                    y = grille.index(row)
+                    
+                    # cas x-1 y
+                    a = (x == xInitial - 1 and y == yInitial)
+                    # cas x+1 y
+                    b = (x == xInitial + 1 and y == yInitial)
+                    #cas x y-1
+                    c = (x == xInitial and y == yInitial - 1)
+                    #cas x y+1
+                    d = (x == xInitial and y == yInitial + 1)
+                    #cas x-1 y-1
+                    e = (x == xInitial - 1 and y == yInitial - 1)
+                    #cas x+1 y+1
+                    f = (x == xInitial + 1 and y == yInitial + 1)
+                    #cas x-1 y+1
+                    g = (x == xInitial - 1 and y == yInitial + 1)
+                    #cas x+1 y-1
+                    h = (x == xInitial + 1 and y == yInitial - 1)
+
+                    if (a or b or c or d or e or f or g or h):
+                        valide = True
+                    else:
+                        valide = False
+                        return valide
+
+                    xInitial = row.index(letter)
+                    yInitial = grille.index(row)
+
+                    break 
+            else:
+                valide = False
+        i += 1
+    return valide
+
+# Fonction qui calcule soit les points dun seul mot, soit les points dune liste de mots
 def calcul_point(grille, mots):
     total = 0
     
@@ -200,7 +273,6 @@ def test_generer_grille():
 grille = generer_grille(4)
 afficher_grille(grille)
 afficher_pointage(grille, 2)
-
 #################################################################################
 # Tests (optionnel)
 test()
