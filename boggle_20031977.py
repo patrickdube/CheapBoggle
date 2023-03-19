@@ -1,7 +1,7 @@
 ###############################################################################
 ## Programme qui simule une version simplifiee du jeu Boggle.
 ###############################################################################
-## Auteur: Patrick Dube
+## Auteurs: Patrick Dube, Johann Sourou
 ## Copyright: Copyright 2023, boggle_20031977.py
 ## Version: 1.0.0
 ## Date: 08/03/23
@@ -15,6 +15,7 @@ import random
 grille = []
 joueurs = []
 liste_mots_joueurs = []
+liste_totaux = []
 mots_rejettes = []
 des_choisis = []
 des = {
@@ -48,6 +49,7 @@ des = {
 # Déclaration des fonctions internes et calculs 
 # avec commentaires détaillés nécessaires seulement (optionnel)
 
+# DONE
 def generer_grille(taille):
     # empeche de prendre un de plus dune fois
     while len(des_choisis) < taille:
@@ -64,6 +66,7 @@ def generer_grille(taille):
 
     return grille
 
+# DONE
 def generer_joueurs(nb_joueurs):
     for joueur in range(int(nb_joueurs)):
         liste_mots_joueurs.append([])
@@ -74,7 +77,9 @@ def generer_joueurs(nb_joueurs):
         joueurs.append(joueur_actuel)
     return joueurs
 
-def afficher_grille(grille):
+# DONE
+# Pas besoin de grille en param puisque grille est globale et generer_grille() la remplie avant cet appel
+def afficher_grille():
     for ligne in grille:
         # top line de ----------- a chaque new line (pattern = (4 * size) + 1)
         print('-' * (len(grille) * 4) + '-')
@@ -86,54 +91,62 @@ def afficher_grille(grille):
     # bottom line de ------------ (vu quon met la top line dans la loop, il va manquer une derniere ligne de -------------)
     print('-' * (len(grille) * 4) + '-')
 
-# IDEA: passer un dict joueur en param pour avoir acces a sa liste de mots et tous ses autres attributs
-def afficher_pointage(grille, joueurs):   
-    
+# DONE
+def afficher_pointage(joueurs):   
+    longueur_base = 29 
+    longueur_reste = 18
+
     # IDEA: faire un for loop pour passer tous les joueurs 
     # PAR CONTRE: il faut aussi un affichage pour un seul joueur
     
-    mots_joueurs_actuel = liste_mots_joueurs[numero_joueur - 1]
-    longueur_mot_plus_long = len(max(mots_joueurs_actuel, key=len))
-    longueur_base = 29 # longueur dune ligne dans lexemple
-    longueur_reste = 18 # longueur dune ligne sans le mot
-    longueur_totale = longueur_mot_plus_long + longueur_reste
-    
-    print(f"JOUEUR {numero_joueur}")
-    # AFFICHAGE -----------------, width de 29 comme dans lexemple du prof (minimum), plus au besoin
-    if longueur_totale > longueur_base:
-        print('-'*longueur_totale)
-    else:
-        print('-'*longueur_base)
-    
-    # AFFICHAGE - MOT       (POINT) -- DECISION
-    for mot in mots_joueurs_actuel:
-        print('- ', end='')
-        
-        # mention ILLEGAL
-        if est_valide(grille, mot):
-            mention_illegal = ""
-        else:
-            mention_illegal = " -- ILLEGAL "
+    for joueur in joueurs:
+        numero_joueur = joueur["numero"]
+        mots_joueurs_actuel = joueur["mots"]
+        longueur_mot_plus_long = len(max(mots_joueurs_actuel, key=len))
+        longueur_totale = longueur_mot_plus_long + longueur_reste
 
-        # TODO: implementer la mention -- REJETER
-        
-        # ajustement de laffichage, centrer en un point fixe
-        if len(mot) == longueur_mot_plus_long:
-            print(mot + ' ' + f'({calcul_point(grille, mot)})' + f'{mention_illegal}')
+        print(f"JOUEUR {numero_joueur}")
+   
+        if longueur_totale > longueur_base:
+            print('-'*longueur_totale)
         else:
-            print(mot + ' ' + ' '*(longueur_mot_plus_long - len(mot)) + f'({calcul_point(grille, mot)})' + f'{mention_illegal}')
-    
-    #AFFICHAGE ========
-    if longueur_totale > longueur_base:
-        print('='*longueur_totale)
-    else:
-        print('='*longueur_base)
-    
-    #AFFICHAGE TOTAL
-    print(f"TOTAL: {calcul_point(grille, mots_joueurs_actuel)}")
+            print('-'*longueur_base)
 
+            for mot in mots_joueurs_actuel:
+                print('- ', end='')
+
+                # mention ILLEGAL
+                if est_valide(mot):
+                    mention = ""
+                else:
+                    mention = " -- ILLEGAL "
+
+                # mention REJETE
+                if mot in mots_rejettes:
+                    mention = " -- REJETE "
+                else:
+                    mention = ""
+
+                # ajustement de laffichage, centrer en un point fixe
+                if len(mot) == longueur_mot_plus_long:
+                    print(mot + ' ' + f'({calcul_point(mot)})' + f'{mention}')
+                else:
+                    print(mot + ' ' + ' '*(longueur_mot_plus_long - len(mot)) + f'({calcul_point(mot)})' + f'{mention}')
+
+        #AFFICHAGE ========
+        if longueur_totale > longueur_base:
+            print('='*longueur_totale)
+        else:
+            print('='*longueur_base)
+
+        #AFFICHAGE TOTAL
+        print(f"TOTAL: {calcul_point(mots_joueurs_actuel)}")
+
+        print()
+
+# NOT DONE
 # TODO: verifier si le mot nest pas deja trouve par un autre joueur -- en faire une autre fonction et lappeler dans jouer()?   
-def est_valide(grille, mot):
+def est_valide(mot):
     # un mot est valide quand:
     # 1. same column
     # 2. same line
@@ -176,13 +189,13 @@ def est_valide(grille, mot):
                     y = grille.index(row)
                     
                     # cas x-1 y
-                    a = (x == xInitial - 1 and y == yInitial)
+                    a = (x == xInitial - 1 and y == yInitial) and (x < len(grille) - 1)
                     # cas x+1 y
-                    b = (x == xInitial + 1 and y == yInitial)
+                    b = (x == xInitial + 1 and y == yInitial) and (x > 0)
                     #cas x y-1
-                    c = (x == xInitial and y == yInitial - 1)
+                    c = (x == xInitial and y == yInitial - 1) and (y < len(grille) - 1)
                     #cas x y+1
-                    d = (x == xInitial and y == yInitial + 1)
+                    d = (x == xInitial and y == yInitial + 1) and (y > 0)
                     #cas x-1 y-1
                     e = (x == xInitial - 1 and y == yInitial - 1)
                     #cas x+1 y+1
@@ -207,12 +220,13 @@ def est_valide(grille, mot):
         i += 1
     return valide
 
-def calcul_point(grille, mots):
+# DONE
+def calcul_point(mots):
     total = 0
     
     # je veux pouvoir utiliser cette fonction pour calculer les points dun seul mot aussi!
     if type(mots) == str:
-        if est_valide(grille, mots):
+        if est_valide(mots):
             if len(mots) == 3:
                 total += 1
             elif len(mots) == 4:
@@ -227,7 +241,7 @@ def calcul_point(grille, mots):
     # lutilisation standard ou on calcule les points de chaque mot dans une liste de mot
     for mot in mots:
         # On calcule les points dun mot seulement sil est valide!
-        if est_valide(grille, mot):
+        if est_valide(mot):
             if len(mot) == 3:
                 total += 1
             elif len(mot) == 4:
@@ -238,22 +252,25 @@ def calcul_point(grille, mots):
                 total += 5
     return total
 
+# DONE
 def demander_nb_joueurs():
     nb_joueurs = input("Entrez le nombre de joueurs: ")
     while not nb_joueurs.isdecimal():
         nb_joueurs = input("Veuillez entrer un nombre de joueurs entier et positif: ")
     return nb_joueurs
 
+# DONE
 def demander_taille():
     taille = input("Entrez la taille de la grille: ")
     while taille not in "456":
         taille = input("Veuillez entrer une taille entiere et positive entre 4 et 6: ")
     return int(taille)
 
+# NOT DONE
 def demander_mot():
     return "test"
 
-# QUESTION: dans le cas où on a plus que 2 joueurs, est-ce que le mot est rejetté si tous les autres joueurs décident de le rejetter, ou lorsqu'un seul joueur décide de le rejetter?
+# DONE
 def demander_rejection(mot, index_joueur_actuel):
     compte_rejets = 0
     
@@ -262,55 +279,121 @@ def demander_rejection(mot, index_joueur_actuel):
         if i == index_joueur_actuel:
             continue
 
-        numero = joueur["numero"]
-        rejet = input(f"JOUEUR {numero} - Rejetter le mot {mot}? [O/N]: ")
-        while rejet.upper() not in "ON":
+        if est_valide(mot): # la mention rejet est possible seulement lorsque le mot est valide, mais que les autres joueurs rejettent le mot
+            numero = joueur["numero"]
             rejet = input(f"JOUEUR {numero} - Rejetter le mot {mot}? [O/N]: ")
+            while rejet.upper() not in "ON":
+                rejet = input(f"JOUEUR {numero} - Rejetter le mot {mot}? [O/N]: ")
 
-        # si le rejet est fait lorsqu'un seul joueur rejette
-        # if rejet == "O":
-        #     mot_rejette = True
-        
-        # si le rejet est fait lorsque tous les joueurs rejettent
-        if rejet == "O":
-            compte_rejets += 1
+            # si le rejet est fait lorsqu'un seul joueur rejette
+            # if rejet == "O":
+            #     mots_rejettes.append(mot)
+            #     break
+
+            # si le rejet est fait lorsque tous les joueurs rejettent
+            if rejet == "O":
+                compte_rejets += 1
     
-    # selon la méthode de rejection dans QUESTION 
     # s'il y a rejection: on ajoute le mot dans une liste
     # on pourra ensuite utiliser cette liste pour déterminer quels sont les mots rejettés et afficher en conséquence   
     if compte_rejets >= len(joueurs) - 1:
         mots_rejettes.append(mot)
 
-def demander_poursuivre():
-    return False
+# DONE
+def demander_poursuivre(index_joueur_actuel):
+    poursuivre = input(f"JOUEUR {index_joueur_actuel} - Voulez-vous poursuivre? [O/N]: ")
+    while poursuivre.upper() not in "ON":
+        poursuivre = input(f"JOUEUR {index_joueur_actuel} - Voulez-vous poursuivre? [O/N]: ")
+    if poursuivre.upper() == "O":
+        poursuivre_bool = True
+    else:
+        poursuivre_bool = False
+    return poursuivre_bool
 
-def jouer():
-    taille = demander_taille()
-    grille = generer_grille(taille)
-    nb_joueurs = demander_nb_joueurs()
-    joueurs = generer_joueurs(nb_joueurs)
+# DONE
+def demander_nb_manches():
+    nb_manches = input("Entrez le nombre de manches: ")
+    while not nb_manches.isdecimal():
+        nb_manches = input("Veuillez entrer un nombre de manches entier et positif: ")
+    return int(nb_manches)
+
+# DONE
+def jouer_tours():
     joueurs_inactifs = []
-    partie_en_cours = True
+    manche_en_cours = True
 
-    while partie_en_cours:
+    while manche_en_cours:
+        
         for i, joueur in enumerate(joueurs):
+            
             if joueur not in joueurs_inactifs:  
                 mot_actuel = demander_mot()
-            demander_rejection(mot_actuel, i)
-            demander_poursuivre()
-            if not demander_poursuivre() or len(joueur["mots"]) >= 10:
-                joueurs_inactifs.append(joueur)
-            if len(joueurs_inactifs) >= len(joueurs):
-                partie_en_cours = False
-                break
-    return
 
+            if not demander_rejection(mot_actuel, i):
+                joueur["mots"].append(mot_actuel)
+            
+            if not demander_poursuivre(i+1) or len(joueur["mots"]) >= 10:
+                joueurs_inactifs.append(joueur)
+            
+            if len(joueurs_inactifs) >= len(joueurs):
+                manche_en_cours = False
+                break
+        
+        print("Tour terminé!")
+
+# DONE
+def jouer_manches(nb_manches, taille):
+    for manche in range(nb_manches):
+        
+        # on reinitie les listes de mots des joueurs a chaque debut de manche
+        for joueur in joueurs:  # on utilise la liste de joueurs globale, remplie par generer_joueurs() avant lappel de cette fonction
+            joueur["mots"] = []
+        
+        jouer_tours()
+
+        totaux = []
+        for joueur in joueurs:
+            numero = joueur["numero"]
+            total = calcul_point(joueur["mots"])
+            print(f"Points du joueur {numero}: {total}")
+            totaux.append(total)                            # liste ordonnee des totaux de chaque joueur
+        liste_totaux.append(totaux)                         # liste contenant les listes de totaux de chaque joueur pour chaque manche
+
+        print("Manche terminée!")
+        
+        if manche < nb_manches: # pas besoin de generer une grille si cest la derniere manche
+            global grille
+            grille = []
+            generer_grille(taille)
+
+            afficher_grille()
+
+# DONE
+def jouer():
+    taille = demander_taille()
+    generer_grille(taille)
+    
+    nb_joueurs = demander_nb_joueurs()
+    generer_joueurs(nb_joueurs)
+    
+    nb_manches = demander_nb_manches()
+    
+    afficher_grille()
+
+    jouer_manches(nb_manches, taille)
+
+    afficher_pointage(joueurs)
+    
+    print("Partie terminée!")
+
+# NOT DONE
 def test():
     # check generer_grille()
     # check est_valide()
     # check calcul_point()
     return
 
+# NOT DONE
 def test_generer_grille():
     generer_grille(0)
     # print(grille)
@@ -318,16 +401,20 @@ def test_generer_grille():
     # for i in range(taille):
     #     for j in range(taille):
     #         assert grille[i][j] in listeDesChoisis[i][j], f"la lettre a la pos ({i}, {j}) nest pas contenue dans le de {i+1}"
+    # - Pour toute taille valide, la fonction me retourne un tableau à 2 dimensions où chaque sous-tableau est de même longueur et est composée de valeurs valides (dés) 
+    # - Pour deux appels successifs, la fonction ne génère pas la même grille
+    # - Pour toute taille non valide, la fonction me retourne un tableau vide (ou autre comportement)
+# NOT DONE
+def test_est_valide():
+    pass
+
+# NOT DONE
+def test_calcul_point():
+    pass
 
 # Déclaration du code principal et Affichage
-
-#grille = generer_grille(4)
-#joueurs = generer_joueurs(2)
-#afficher_grille(grille)
-#afficher_pointage(grille, joueurs)
 jouer()
-#print(joueurs)
+
 #################################################################################
 # Tests (optionnel)
-
 test()
