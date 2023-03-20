@@ -381,7 +381,6 @@ def demander_mot(joueur):
     
     return mot
 
-# DONE 
 def demander_rejection(grille, mot, joueur_, joueurs):
     compte_rejets = 0
 
