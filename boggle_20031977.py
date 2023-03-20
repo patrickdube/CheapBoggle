@@ -53,7 +53,6 @@ des = {
 
 # Déclaration des fonctions internes et calculs 
 # avec commentaires détaillés nécessaires seulement (optionnel)
-
 def generer_grille(taille):
     grille = [["" for _ in range(taille)] for _ in range(taille)]
     
@@ -502,19 +501,14 @@ def test():
     # check generer_grille()
     # check est_valide()
     # check calcul_point()
-    return
+    pass
 
 # NOT DONE
 def test_generer_grille():
-    generer_grille(0)
-    # print(grille)
-    # print(listeDesChoisis)
-    # for i in range(taille):
-    #     for j in range(taille):
-    #         assert grille[i][j] in listeDesChoisis[i][j], f"la lettre a la pos ({i}, {j}) nest pas contenue dans le de {i+1}"
     # - Pour toute taille valide, la fonction me retourne un tableau à 2 dimensions où chaque sous-tableau est de même longueur et est composée de valeurs valides (dés) 
     # - Pour deux appels successifs, la fonction ne génère pas la même grille
     # - Pour toute taille non valide, la fonction me retourne un tableau vide (ou autre comportement)
+    pass
 
 # NOT DONE
 def test_est_valide():
