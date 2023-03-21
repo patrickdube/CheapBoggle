@@ -1,3 +1,3 @@
 # CheapBoggle
 
-![alt text](C:\SchoolProjects\Devoir1\Images\1.PNG "Title")
+![image info](./pictures/1.PNG)
