@@ -206,12 +206,12 @@ def est_valide(grille, mot):
     if type(mot) != str or mot == "":           # Caractère vide ou tout autre type que str donne 0 point.
         return False
     
-    positions_utilisees = []
-    
     # On commence par vérifier si la première lettre du mot entré est contenue dans la grille.
     
     for x, ligne in enumerate(grille):
         for y, lettre in enumerate(ligne):
+            
+            positions_utilisees = []
             
             # On commence par vérifier si la première lettre du mot entré est contenue dans la grille.
 
