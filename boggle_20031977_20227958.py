@@ -54,7 +54,15 @@ des = {
 # Déclaration des fonctions internes et calculs 
 # avec commentaires détaillés nécessaires seulement (optionnel)
 def generer_grille(taille):
+    """Cette fonction retourne une grille de dimension taille x taille remplie de faces de dés aléatoires.
 
+    Args:
+        taille (int): Dimensions de la grille.
+
+    Returns:
+        list[list[str]]: Liste 2D (grille) contenant des string (faces de dés).
+        list: Liste (faces_choisies) contenant des string (faces de dés).
+    """
     # Dans le cas où la gestion d'input du user n'est pas assez pour garantir une taille de type valide et qui fonctionne avec le nombre de dés disponibles, on retourne None, None.
 
     if (type(taille) != int):
@@ -83,16 +91,25 @@ def generer_grille(taille):
 
     for ligne in range(taille):
         for colonne in range(taille):
-            grille[ligne][colonne] = faces_choisies[ligne*4+colonne]
+            grille[ligne][colonne] = faces_choisies[ligne*taille + colonne]                     
     
     return grille, faces_choisies
 
 def generer_joueurs(nb_joueurs):
+    """Cette fonction retourne une liste de joueurs générée à partir du nombre de joueurs entré par l'utilisateur.
+
+    Args:
+        nb_joueurs (int): Nombre de joueurs.
+
+    Returns:
+        list: Liste (joueurs) qui contient tous les joueurs.
+    """
+    
     joueurs = []
     
     # Chaque joueur est généré avec ses attributs: numéro, mots, mots rejettés et points totaux par manche.
     
-    for joueur in range(int(nb_joueurs)):
+    for joueur in range(nb_joueurs):
         joueur_actuel = {
             "numero" : joueur + 1,
             "mots" : [], 
@@ -104,6 +121,12 @@ def generer_joueurs(nb_joueurs):
     return joueurs
 
 def afficher_grille(grille):
+    """Cette fonction affiche dans le terminal la grille qu'elle prend en paramètre.
+
+    Args:
+        grille (list[list[str]]): Grille à afficher.
+    """
+
     for ligne in grille:
         print('-' * (len(grille) * 4) + '-') # En comptant les '-' avec taille 4, 5 et 6, on trouve le pattern '-'*(taille*4) + '-'.
         print('|', end=' ')                  # '| ' avant chaque lettre.
@@ -113,6 +136,13 @@ def afficher_grille(grille):
     print('-' * (len(grille) * 4) + '-')     # Dernière ligne remplie de '-'.
 
 def afficher_pointage_manche(grille, joueurs):   
+    """Cette fonction affiche dans le terminal le pointage de chacun des joueurs à chaque fin de manche.
+
+    Args:
+        grille (list[list[str]]): Grille selon laquelle les points sont validés.
+        joueurs (list): Liste qui contient tous les joueurs.
+    """
+    
     longueur_base = 29      # Nombre de caractères total de base dans l'exemple.
     longueur_reste = 18     # Nombre de caractères de la partie incluant seulement ce qu'il se trouve à la droite du pointage. 
     
@@ -167,6 +197,12 @@ def afficher_pointage_manche(grille, joueurs):
         print()
 
 def afficher_pointage_fin(joueurs):
+    """Cette fonction affiche dans le terminal le pointage de chacun des joueurs à la fin de la partie, puis annonce le ou les gagnants.
+
+    Args:
+        joueurs (list): Liste qui contient tous les joueurs.
+    """
+    
     totaux = []
     egalites = []
     
@@ -203,6 +239,16 @@ def afficher_pointage_fin(joueurs):
         print(f"JOUEUR {numero_joueur_gagnant} a gagné!")
 
 def est_valide(grille, mot):
+    """Cette fonction retourne un booléen indiquant si le mot entré en paramètre est un mot valide ou non selon les règles de Boggle.
+
+    Args:
+        grille (list[list[str]]): Grille selon laquelle les mots sont validés.
+        mot (str): Le mot à valider.
+
+    Returns:
+        bool: Booléen indiquant si le mot est valide.
+    """
+    
     if type(mot) != str or mot == "":           # Caractère vide ou tout autre type que str donne 0 point.
         return False
     
@@ -255,6 +301,16 @@ def est_valide(grille, mot):
     return False
 
 def calcul_point(grille, mots):
+    """Cette fonction retourne le total des points que vaut une liste de mots ou un seul mot.
+
+    Args:
+        grille (list[list[str]]): Grille selon laquelle les mots sont validés.
+        mots (list ou str): Peut être une liste contenant les mots à calculer ou peut être un seul mot à calculer n'étant pas dans une liste.
+
+    Returns:
+        int: Nombre entier qui représente le total des points calculés des mots ou du mot en paramètre.
+    """
+    
     total = 0
     
     if len(grille) == 4:
@@ -365,6 +421,13 @@ def calcul_point(grille, mots):
     return total
 
 def ajouter_points_totaux(grille, joueurs):
+    """Cette fonction remplit les listes de points totaux de chaque joueur.
+
+    Args:
+        grille (list[list[str]]): Grille selon laquelle les mots sont validés.
+        joueurs (list): Liste qui contient tous les joueurs.
+    """
+    
     for joueur in joueurs:
         points_totaux = 0
         for mot in joueur["mots"]:
@@ -372,14 +435,26 @@ def ajouter_points_totaux(grille, joueurs):
         joueur["points_totaux"].append(points_totaux)
 
 def demander_nb_joueurs():
+    """Cette fonction demande à l'utilisateur d'entrer un nombre de joueurs, puis le retourne.
+
+    Returns:
+        int: Nombre de joueurs entré par l'utilisateur.
+    """
+
     nb_joueurs = input("Entrez le nombre de joueurs: ")
     
     while not nb_joueurs.isdecimal():
         nb_joueurs = input("Veuillez entrer un nombre de joueurs entier et positif: ")
     
-    return nb_joueurs
+    return int(nb_joueurs)
 
 def demander_taille():
+    """Cette fonction demande à l'utilisateur d'entrer la taille de la grille, puis la retourne.
+
+    Returns:
+        int: Taille de la grille entrée par l'utilisateur.
+    """
+    
     taille = input("Entrez la taille de la grille: ")
     
     while taille not in "456" or taille == "":
@@ -388,6 +463,15 @@ def demander_taille():
     return int(taille)
 
 def demander_mot(joueur):
+    """Cette fonction demande au joueur d'entrer un mot, puis le retourne.
+
+    Args:
+        joueur (dict): Dictionnaire représentant le joueur qui se fait demander d'entrer un mot.
+
+    Returns:
+        str: Le mot entré par le joueur.
+    """
+    
     numero_joueur = joueur["numero"]
     mot = input(f"JOUEUR {numero_joueur} - Entrez votre mot: ")
     
@@ -397,6 +481,19 @@ def demander_mot(joueur):
     return mot
 
 def demander_rejection(grille, mot, joueur_, joueurs):
+    """Cette fonction demande aux joueurs autres que celui qui vient de se faire 
+    demander d'entrer un mot s'ils veulent rejetter le mot, puis retourne un booléen indiquant l'unanimité ou non du rejet.
+
+    Args:
+        grille (list[list[str]]): Grille selon laquelle les mots sont validés.
+        mot (str): Mot à rejetter ou non.
+        joueur_ (dict): Dictionnaire représentant le joueur qui se fait demander de rejetter le mot ou non.
+        joueurs (list): Liste qui contient tous les joueurs.
+
+    Returns:
+        bool: Booléen représentant la décision finale - vrai si le mot est rejetté, faux si le mot n'est pas rejetté.
+    """
+    
     compte_rejets = 0
 
     for joueur in joueurs:
@@ -421,6 +518,15 @@ def demander_rejection(grille, mot, joueur_, joueurs):
     return False
 
 def demander_poursuivre(joueur):
+    """Cette fonction demande au joueur s'il veut continuer à jouer (entrer des mots) la manche, puis retourne un booléen indiquant la décision du joueur.
+
+    Args:
+        joueur (dict): Dictionnaire représentant le joueur qui se fait demander de continuer ou non.
+
+    Returns:
+        bool: Booléen représentant la décision du joueur - vrai si le joueur continue de jouer, faux si le joueur arrête de jouer.
+    """
+
     numero_joueur = joueur["numero"]
     poursuivre = input(f"JOUEUR {numero_joueur} - Voulez-vous poursuivre? [O/N]: ")
     
@@ -436,6 +542,12 @@ def demander_poursuivre(joueur):
     return poursuivre_bool
 
 def demander_nb_manches():
+    """Cette fonction demande à l'utilisateur d'entrer le nombre de manches à jouer, puis le retourne.
+
+    Returns:
+        int: Nombre entier représentant le nombre de manches entré par l'utilisateur.
+    """
+
     nb_manches = input("Entrez le nombre de manches: ")
     
     while not nb_manches.isdecimal():
@@ -444,6 +556,12 @@ def demander_nb_manches():
     return int(nb_manches)
 
 def demander_nouvelle_partie():
+    """Cette fonction demande à l'utilisateur s'il veut faire une nouvelle partie ou non, puis retourne un booléen.
+
+    Returns:
+        bool: Booléen représentant la décision de l'utilisateur - vrai s'il veut faire une nouvelle partie, faux s'il ne veut pas faire de nouvelle partie.
+    """
+
     nouvelle_partie = input("Voulez-vous jouer une nouvelle partie? [O/N]: ")
     
     while nouvelle_partie.upper() not in "ON" or nouvelle_partie.upper() == "":  
@@ -456,6 +574,13 @@ def demander_nouvelle_partie():
         return True
 
 def jouer_tours(grille, joueurs):
+    """Cette fonction débute les tours d'une manche.
+
+    Args:
+        grille (list[list[str]]): Grille selon laquelle les mots sont validés. 
+        joueurs (list): Dictionnaire représentant le joueur qui se fait demander de continuer ou non.
+    """
+    
     manche_en_cours = True
 
     joueurs_inactifs = []
@@ -482,6 +607,9 @@ def jouer_tours(grille, joueurs):
         print("Tour terminé!")
 
 def jouer_manches():
+    """Cette fonction débute les manches d'une partie.
+    """
+
     taille = demander_taille()  
     grille, faces_choisies = generer_grille(taille)             # faces_choisies est seulement déclaré pour que seulement la valeur de retour grille soit assignée à grille 
     joueurs = generer_joueurs(demander_nb_joueurs())            # (puisque generer_grille(taille) retourne une grille et une liste des faces de dés choisies).
@@ -498,13 +626,15 @@ def jouer_manches():
         
         if manche < nb_manches - 1:                             # Pas besoin de générer une nouvelle grille si c'est la dernière manche.
             grille, faces_choisies = generer_grille(taille)     # Même principe que le faces_choisies ci-haut.
-
-        afficher_grille(grille)
+            afficher_grille(grille)
 
     afficher_pointage_fin(joueurs)
     print("Partie terminée!")
 
 def jouer():
+    """Cette fonction débute la partie.
+    """
+    
     partie_en_cours = True   
 
     while partie_en_cours: 
@@ -515,6 +645,16 @@ def jouer():
             partie_en_cours = False
 
 def comparer_matrices(matrice_1, matrice_2):
+    """Cette fonction compare une matrice à une autre et indique si elles sont égales ou non en retournant un bool.
+
+    Args:
+        matrice_1 (list[list[any]]): Liste 2D représentant la première matrice.
+        matrice_2 (list[list[any]]): Liste 2D représentant la deuxième matrice.
+
+    Returns:
+        bool: Booléen indiquant si les matrices sont égales ou non.
+    """
+    
     if len(matrice_1) != len(matrice_2):
         return False
     
@@ -528,64 +668,67 @@ def comparer_matrices(matrice_1, matrice_2):
     return True
 
 def test():
+    """Cette fonction teste les fonctions generer_grille(), est_valide() et calcul_point().
+    """
+
+    def test_generer_grille():
+        tailles = [4, 5, 6]
+    
+        for taille in tailles:
+            grille_1, faces_choisies_1 = generer_grille(taille)
+            grille_2, faces_choisies_2 = generer_grille(taille)
+    
+            assert comparer_matrices(grille_1, grille_2) == False, "Échec: Deux grilles générées devraient pratiquement toujours être différentes."
+    
+            assert len(grille_1) == taille, "Échec: len(grille) == taille."
+            for i, ligne in enumerate(grille_1):
+                assert len(ligne) == taille, "Échec: len(ligne) == taille."
+                for j, lettre in enumerate(ligne):
+                    assert lettre in faces_choisies_1[taille*i + j], "Échec: lettre in faces_choisies[4*i + j]."                        
+        
+        assert generer_grille(7) == (None, None), "Échec: taille invalide (valeur trop grande) ne devrait pas générer de grille ou de liste de faces choisies."
+        assert generer_grille('GG') == (None, None), "Échec: taille invalide (type) ne devrait pas générer de grille ou de liste de faces choisies."
+        assert generer_grille(0) == ([], []), "Échec: taille = 0 devrait générer une grille vide et une liste de faces choisies vide."
+    
+    def test_est_valide():
+        grille = [['A', 'B', 'A', 'D'],
+                  ['E', 'F', 'G', 'H'],
+                  ['I', 'A', 'K', 'L'],
+                  ['M', 'N', 'O', 'P']]
+        
+        assert est_valide(grille, 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') == False, "Échec: mot constitué d'une répétition de même lettre (même position réutilisée)."
+        assert est_valide(grille, 3) == False, "Échec: mot de type autre que 'str'"
+        assert est_valide(grille, 'Z') == False, "Échec: mot composé de lettres qui ne se trouvent pas dans la grille."
+        assert est_valide(grille, '') == False, "Échec: mot vide."
+        assert est_valide(grille, 'EGMP') == False, "Échec: mot composé de lettres dans la grille, mais qui ne sont pas adjacents."
+    
+        assert est_valide(grille, 'ABA') == True, "Échec: mot horizontal."
+        assert est_valide(grille, 'AFK') == True, "Échec: mot diagonal."
+        assert est_valide(grille, 'AEI') == True, "Échec: mot vertical."
+        assert est_valide(grille, 'AFBEIA') == True, "Échec: mot combiné (horizontal + vertical + diagonal)."
+        assert est_valide(grille, 'AKL') == True, "Échec: mot avec première lettre présente plusieurs fois dans la grille et qui n'est pas formé à partir de la première instance de la dite première lettre."
+    
+    def test_calcul_point():
+        grille = [['A', 'B', 'C', 'D'],
+                  ['E', 'F', 'G', 'H'],
+                  ['I', 'J', 'K', 'L'],
+                  ['M', 'N', 'O', 'P']]
+        
+        liste_mots = ['ABCD', '', 'AB', 'AFBE', 23]
+    
+        assert calcul_point(grille, '') == 0, "Échec: calcul_point(grille, 'A') == 0."
+        assert calcul_point(grille, 'ACJP') == 0, "Échec: calcul_point(grille, 'ACJP'), où 'ACJP' est un mot invalide."
+        assert calcul_point(grille, 'ABCD') == 2, "Échec: calcul_point(grille, 'ABCD'), où 'ABCD' est un mot valide."
+        assert calcul_point(grille, 23) == 0, "Échec: calcul_point(grille, 23)."
+        assert calcul_point(grille, liste_mots) == 4, "Échec: calcul_point(grille, liste_mots)."
+
     test_generer_grille()
     test_est_valide()
     test_calcul_point()
-
-def test_generer_grille():
-    tailles = [4, 5, 6]
-
-    for taille in tailles:
-        grille_1, faces_choisies_1 = generer_grille(taille)
-        grille_2, faces_choisies_2 = generer_grille(taille)
-
-        assert comparer_matrices(grille_1, grille_2) == False, "Échec: Deux grilles générées devraient pratiquement toujours être différentes."
-
-        assert len(grille_1) == taille, "Échec: len(grille) == taille."
-        for i, ligne in enumerate(grille_1):
-            assert len(ligne) == taille, "Échec: len(ligne) == taille."
-            for j, lettre in enumerate(ligne):
-                assert lettre in faces_choisies_1[4*i + j], "Échec: lettre in faces_choisies[4*i + j]."
-    
-    assert generer_grille(7) == (None, None), "Échec: taille invalide (valeur trop grande) ne devrait pas générer de grille ou de liste de faces choisies."
-    assert generer_grille('GG') == (None, None), "Échec: taille invalide (type) ne devrait pas générer de grille ou de liste de faces choisies."
-    assert generer_grille(0) == ([], []), "Échec: taille = 0 devrait générer une grille vide et une liste de faces choisies vide."
-
-def test_est_valide():
-    grille = [['A', 'B', 'A', 'D'],
-              ['E', 'F', 'G', 'H'],
-              ['I', 'A', 'K', 'L'],
-              ['M', 'N', 'O', 'P']]
-    
-    assert est_valide(grille, 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') == False, "Échec: mot constitué d'une répétition de même lettre (même position réutilisée)."
-    assert est_valide(grille, 3) == False, "Échec: mot de type autre que 'str'"
-    assert est_valide(grille, 'Z') == False, "Échec: mot composé de lettres qui ne se trouvent pas dans la grille."
-    assert est_valide(grille, '') == False, "Échec: mot vide."
-    assert est_valide(grille, 'EGMP') == False, "Échec: mot composé de lettres dans la grille, mais qui ne sont pas adjacents."
-
-    assert est_valide(grille, 'ABA') == True, "Échec: mot horizontal."
-    assert est_valide(grille, 'AFK') == True, "Échec: mot diagonal."
-    assert est_valide(grille, 'AEI') == True, "Échec: mot vertical."
-    assert est_valide(grille, 'AFBEIA') == True, "Échec: mot combiné (horizontal + vertical + diagonal)."
-    assert est_valide(grille, 'AKL') == True, "Échec: mot avec première lettre présente plusieurs fois dans la grille et qui n'est pas formé à partir de la première instance de la dite première lettre."
-
-def test_calcul_point():
-    grille = [['A', 'B', 'C', 'D'],
-              ['E', 'F', 'G', 'H'],
-              ['I', 'J', 'K', 'L'],
-              ['M', 'N', 'O', 'P']]
-    
-    liste_mots = ['ABCD', '', 'AB', 'AFBE', 23]
-
-    assert calcul_point(grille, '') == 0, "Échec: calcul_point(grille, 'A') == 0."
-    assert calcul_point(grille, 'ACJP') == 0, "Échec: calcul_point(grille, 'ACJP'), où 'ACJP' est un mot invalide."
-    assert calcul_point(grille, 'ABCD') == 2, "Échec: calcul_point(grille, 'ABCD'), où 'ABCD' est un mot valide."
-    assert calcul_point(grille, 23) == 0, "Échec: calcul_point(grille, 23)."
-    assert calcul_point(grille, liste_mots) == 4, "Échec: calcul_point(grille, liste_mots)."
 
 # Déclaration du code principal et Affichage
 jouer()
 
 #################################################################################
 # Tests (optionnel)
-test()
+# test() # Enlevez en commentaire pour exécuter les tests
